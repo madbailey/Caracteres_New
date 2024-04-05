@@ -1,0 +1,89 @@
+[gd_scene load_steps=8 format=3 uid="uid://c8pgmqi80j1ro"]
+
+[ext_resource type="Script" path="res://Scenes/Card/CardUI.cs" id="1_wqg70"]
+[ext_resource type="Script" path="res://Scenes/Card/Colorbox.cs" id="2_dr04b"]
+[ext_resource type="Script" path="res://Scenes/Card/FSM.cs" id="3_t5qvl"]
+[ext_resource type="Script" path="res://Scenes/Card/CardStates/Base.cs" id="4_38tja"]
+[ext_resource type="Script" path="res://Scenes/Card/CardStates/Clicked.cs" id="5_42q7c"]
+[ext_resource type="Script" path="res://Scenes/Card/CardStates/Hover.cs" id="5_b1mmb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rqxlg"]
+size = Vector2(92, 103)
+
+[node name="CardUI" type="Control"]
+custom_minimum_size = Vector2(90, 105)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1190.0
+offset_bottom = -615.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wqg70")
+
+[node name="Colorbox" type="ColorRect" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 105)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12549, 0.34902, 0.176471, 1)
+script = ExtResource("2_dr04b")
+
+[node name="Button" type="Button" parent="Colorbox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="State" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "State
+"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DropPointDetector" type="Area2D" parent="."]
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DropPointDetector"]
+position = Vector2(45, 51.5)
+shape = SubResource("RectangleShape2D_rqxlg")
+
+[node name="FSM" type="Node" parent="."]
+script = ExtResource("3_t5qvl")
+InitialState = NodePath("Base")
+
+[node name="Base" type="Node" parent="FSM"]
+script = ExtResource("4_38tja")
+
+[node name="Clicked" type="Node" parent="FSM"]
+script = ExtResource("5_42q7c")
+
+[node name="Dragging" type="Node" parent="FSM"]
+
+[node name="Aiming" type="Node" parent="FSM"]
+
+[node name="Released" type="Node" parent="FSM"]
+
+[node name="Hover" type="Node" parent="FSM"]
+script = ExtResource("5_b1mmb")
+
+[connection signal="mouseClickCard" from="Colorbox" to="FSM/Hover" method="_on_colorbox_mouse_click_card"]
+[connection signal="mouse_entered" from="Colorbox" to="FSM/Base" method="_on_colorbox_mouse_entered"]
+[connection signal="mouse_exited" from="Colorbox" to="FSM/Hover" method="_on_colorbox_mouse_exited"]
+[connection signal="pressed" from="Colorbox/Button" to="FSM/Hover" method="_on_button_pressed"]
